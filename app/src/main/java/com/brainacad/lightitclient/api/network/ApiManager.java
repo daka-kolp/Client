@@ -1,6 +1,5 @@
 package com.brainacad.lightitclient.api.network;
 
-import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.brainacad.lightitclient.LightItClientApp;

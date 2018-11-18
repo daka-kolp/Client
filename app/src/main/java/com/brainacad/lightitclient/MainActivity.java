@@ -2,19 +2,10 @@ package com.brainacad.lightitclient;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.brainacad.lightitclient.api.Constants;
-import com.brainacad.lightitclient.api.models.ResProduct;
 import com.brainacad.lightitclient.api.models.regist.ReqRegistration;
 import com.brainacad.lightitclient.api.network.ApiManager;
-import com.brainacad.lightitclient.trash.models.LoginUserRequest;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         userRequest.setPassword("user123");
         new ApiManager().login(userRequest);*/
 //        new ApiManager().registration(userRequest.getUsername(), userRequest.getPassword());
-
 
 
     }
