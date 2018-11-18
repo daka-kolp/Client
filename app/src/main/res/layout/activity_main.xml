@@ -5,10 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ImageView
+    <ListView
+        android:id="@+id/list_item"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitCenter"
-        android:id="@+id/image_url"/>
+        android:layout_height="match_parent">
+
+    </ListView>
 
 </LinearLayout>

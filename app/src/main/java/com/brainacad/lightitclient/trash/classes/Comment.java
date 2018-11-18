@@ -1,4 +1,4 @@
-package com.brainacad.lightitclient.classes;
+package com.brainacad.lightitclient.trash.classes;
 
 public class Comment {
     private int id;
