@@ -1,9 +1,12 @@
 package com.brainacad.lightitclient.api.network;
 
+import android.util.Base64;
 import android.util.Log;
 
 import com.brainacad.lightitclient.LightItClientApp;
 import com.brainacad.lightitclient.api.Constants;
+import com.brainacad.lightitclient.api.ErrorUtils;
+import com.brainacad.lightitclient.api.models.ApiError;
 import com.brainacad.lightitclient.api.models.ResProduct;
 import com.brainacad.lightitclient.api.models.ResProductComment;
 import com.brainacad.lightitclient.api.models.auth.ReqAuthorization;
@@ -23,6 +26,7 @@ public class ApiManager {
     private LightItClientApp mApp = LightItClientApp.getAppInstance();
     private ApiService mService;
 
+
     public ApiManager() {
         this.mService = LightItClientApp.getAppInstance().getService();
     }
@@ -38,16 +42,10 @@ public class ApiManager {
             public void onResponse(Call<ResRegistration> call, Response<ResRegistration> response) {
                 if (response.isSuccessful()) {
                     ResRegistration resRegistration = response.body();
-
                     Log.d(Constants.TAG, "onResponse: " + resRegistration);
 
-                    mApp.getSharedPreferences()
-                            .edit()
-                            .putString("token", resRegistration.getToken())
-                            .putBoolean("success", resRegistration.isSuccess())
-                            .apply();
-                }else {
-                    Log.d(Constants.TAG, "onResponse: " + call.request() + " " + response.message() + " " + response.errorBody());
+                } else {
+                    Log.d(Constants.TAG, "onResponse: " + response.errorBody());
                 }
 
             }
@@ -64,12 +62,24 @@ public class ApiManager {
         resAuthorizationCall.enqueue(new Callback<ResAuthorization>() {
             @Override
             public void onResponse(Call<ResAuthorization> call, Response<ResAuthorization> response) {
+                if (response.isSuccessful()) {
+                    ResAuthorization resAuth = response.body();
 
+                    Log.d(Constants.TAG, "onResponse: " + resAuth);
+
+                    mApp.getSharedPreferences()
+                            .edit()
+                            .putString(Constants.TOKEN, resAuth != null ? resAuth.getToken() : null)
+                            .putBoolean(Constants.SUCCESS, resAuth != null && resAuth.isSuccess())
+                            .apply();
+                } else {
+                    Log.d(Constants.TAG, "onResponse: " + response.errorBody());
+                }
             }
 
             @Override
             public void onFailure(Call<ResAuthorization> call, Throwable t) {
-
+                Log.d(Constants.TAG, "onFailure: error " + t.getMessage());
             }
         });
     }
@@ -80,9 +90,11 @@ public class ApiManager {
         listProductsCall.enqueue(new Callback<List<ResProduct>>() {
             @Override
             public void onResponse(Call<List<ResProduct>> call, Response<List<ResProduct>> response) {
-                List<ResProduct> listProducts = response.body();
-                mProductResponse.onProductRes(listProducts);
-                Log.d(Constants.TAG, "onResponse: " + listProducts);
+                if (response.isSuccessful()) {
+                    List<ResProduct> listProducts = response.body();
+                    mProductResponse.onProductRes(listProducts);
+                    Log.d(Constants.TAG, "onResponse: " + listProducts);
+                }
             }
 
             @Override
@@ -93,20 +105,36 @@ public class ApiManager {
 
     }
 
-    public void postCommentAboutProduct(int product_id, ReqComment comment) {
-        Call<ResComment> resCommentCall = mService.postCommentAboutProduct(product_id, comment);
+    public void postCommentAboutProduct(String token, int product_id, ReqComment comment) {
+        Call<ResComment> resCommentCall = mService.postCommentAboutProduct(token, product_id, comment);
         resCommentCall.enqueue(new Callback<ResComment>() {
             @Override
             public void onResponse(Call<ResComment> call, Response<ResComment> response) {
-
+                if (response.isSuccessful()) {
+                    ResComment resComment = response.body();
+                    Log.d(Constants.TAG, "onResponse: " + resComment.getReviewId());
+                } else {
+                    switch (response.code()) {
+                        case 404:
+                            Log.d(Constants.TAG, "onResponse: not found");
+                            break;
+                        case 500:
+                            Log.d(Constants.TAG, "onResponse: server is broken");
+                            break;
+                        default:
+                            Log.d(Constants.TAG, "onResponse: unknown");
+                    }
+                }
             }
 
             @Override
             public void onFailure(Call<ResComment> call, Throwable t) {
-
+                Log.d(Constants.TAG, "onFailure: " + t.getMessage());
             }
         });
     }
+
+
 
     public void getCommentsAboutProduct(int product_id) {
         Call<List<ResProductComment>> resProductCommentCall = mService.getCommentsAboutProduct(product_id);
@@ -123,5 +151,6 @@ public class ApiManager {
             }
         });
     }
+
 
 }

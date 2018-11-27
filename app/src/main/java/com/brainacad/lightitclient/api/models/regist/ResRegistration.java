@@ -6,10 +6,8 @@ import com.google.gson.annotations.SerializedName;
 public class ResRegistration {
 
     @SerializedName("success")
-    @Expose
     private boolean success;
     @SerializedName("token")
-    @Expose
     private String token;
 
     public ResRegistration() {

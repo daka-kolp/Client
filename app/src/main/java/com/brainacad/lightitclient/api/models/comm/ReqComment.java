@@ -18,8 +18,10 @@ public class ReqComment {
 
     public ReqComment(int rate, String text) {
         super();
+
         this.rate = rate;
         this.text = text;
+
     }
 
     public int getRate() {
@@ -37,5 +39,6 @@ public class ReqComment {
     public void setText(String text) {
         this.text = text;
     }
+
 
 }
